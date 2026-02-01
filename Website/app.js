@@ -39,12 +39,17 @@ app.use(
       sameSite: "lax",
     },
     rolling: true,
-  })
+  }),
 );
 
-app.use('/' , (req , res) => {
+app.get("/", (req, res) => {
   res.render("index");
-})
+});
+
+app.use(
+  "/auth",
+  await import("./routes/auth/auth.js").then((module) => module.default),
+);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
