@@ -11,8 +11,7 @@ import pool from "./config/db.js";
 import workshopRoutes from './routes/workshop/workshop.js';
 import { GlobalRouter } from "./routes/index.js";
 import { corsOptions } from "./config/corsOptions.js";
-import globalErrorHandler from "./middleware/global_error_handler.middleware.js";
-import { notFoundMiddleware } from "./middleware/not_found.middleware.js";
+import { get404, get500 } from "./controllers/error/error.controller.js";
 
 const app = express();
 
@@ -77,9 +76,7 @@ app.use(flash());
 app.use('/v1/workshops', workshopRoutes);
 app.use("/v1", GlobalRouter);
 
-
-app.use(notFoundMiddleware);
-
-app.use(globalErrorHandler);
+app.use(get404);
+app.use(get500);
 
 export default app;
