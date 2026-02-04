@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import session from "express-session";
+import flash from "connect-flash";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import connectPgSimpleImport from "connect-pg-simple";
@@ -28,7 +29,10 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: true,  
+  credentials: true
+}));
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -67,11 +71,12 @@ app.use(
   }),
 );
 
+app.use(flash());
+
 app.use('/v1/workshops', workshopRoutes);
 app.use("/v1", GlobalRouter);
 
 app.use(get404);
 app.use(get500);
-
 
 export default app;
