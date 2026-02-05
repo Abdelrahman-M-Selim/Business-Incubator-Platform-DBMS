@@ -17,12 +17,12 @@ import {
 } from "../../validations/auth/auth.validation.js";
 import { validateBody } from "../../utils/validate.js";
 import upload from "../../config/multer.js";
-import { isAuthenticated } from "../../middleware/auth.middlware.js";
+import { protect } from "../../middleware/auth.middlware.js";
 
 const router = Router();
 
 const uploadProfileImage = (req, res, next) => {
-  upload.single("profilePicture")(req, res, (err) => { // تأكد إن الاسم "profilePicture" زي ما في الـ HTML
+  upload.single("profilePicture")(req, res, (err) => {
     if (err) {
       if (err.code === "LIMIT_FILE_SIZE") {
         return res
@@ -40,27 +40,27 @@ const uploadProfileImage = (req, res, next) => {
 // Pages
 router.get("/signup", signupPage);
 router.get("/login", loginPage);
-router.get("/profile", isAuthenticated, profilePage);
+router.get("/profile", protect, profilePage);
 
 // Pages Logic
 router.post("/register", register);
 router.post("/login", login);
-router.post("/logout", isAuthenticated, logout);
+router.post("/logout", protect, logout);
 
 router.post(
   "/profile/upload-picture",
-  isAuthenticated,
+  protect,
   uploadProfileImage,
   updateProfileImage
 );
 
 router.post(
   "/profile/update-password",
-  isAuthenticated,
+  protect,
   // validateBody(updatePasswordSchema),
   changePassword
 );
 
-router.get("/me", isAuthenticated, getBasicUserData);
+router.get("/me", protect, getBasicUserData);
 
 export { router as AuthRouter };

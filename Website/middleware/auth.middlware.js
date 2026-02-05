@@ -1,11 +1,14 @@
-import { UnAuthorizedError } from "../utils/error.js";
+import { get401 } from "../controllers/error/error.controller.js";
 
-export const isAuthenticated = (req, res, next) => {
-  if (req.session && req.session.userId) {
-    return next();
+export const protect = (req, res, next) => {
+  if (!req.session || !req.session.userId) {
+    return get401(req, res);
   }
 
-  throw new UnAuthorizedError("User not authenticated. Please login first");
+  req.user = {
+    id: req.session.userId,
+    role: req.session.userRole,
+  };
+
+  next();
 };
-
-
