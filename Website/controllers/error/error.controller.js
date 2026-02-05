@@ -49,7 +49,22 @@ export const get403 = (req, res) => {
   });
 };
 
-// 4. 500 Internal Server Error 
+// 4. 429 Rate Limiter
+export const get429 = (req, res) => {
+  res.status(429).render("error/error", {
+    user: req.session?.userId ? { role: req.session.userRole } : null,
+    routes: { signupRoute: "/v1/auth/signup", loginRoute: "/v1/auth/login" },
+    title: "Slow Down!",
+    statusCode: "429",
+    message: "Too many requests. You're clicking too fast! Please take a breather and try again later.",
+    color: "#FFA500",
+    icon: "fa-solid fa-hourglass-half",
+    redirectLink: "/",
+    buttonText: "Go Home",
+  });
+};
+
+// 5. 500 Internal Server Error 
 export const get500 = (err, req, res, next) => {
   console.error("SERVER ERROR:", err); 
   res.status(500).render("error/error", {

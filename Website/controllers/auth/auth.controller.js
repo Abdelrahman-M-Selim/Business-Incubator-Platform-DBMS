@@ -12,7 +12,6 @@ import sharp from "sharp";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
-import { BadRequestError, NotFoundError } from "../../utils/error.js";
 
 export const signupPage = (req, res) =>
   res.render("auth/signup", {

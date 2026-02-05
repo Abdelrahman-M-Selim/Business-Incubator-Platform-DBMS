@@ -1,13 +1,14 @@
-import { UnAuthorizedError, ForbiddenError } from "../utils/error.js";
+import { get401, get403 } from "../controllers/error/error.controller.js";
 
 export const authorizeRole = (...roles) => {
   return (req, res, next) => {
+    
     if (!req.session || !req.session.userRole) {
-      throw new UnAuthorizedError("User not authenticated. Please login first.");
+      return get401(req, res);
     }
 
     if (!roles.includes(req.session.userRole)) {
-      throw new ForbiddenError("You do not have permission to access this resource.");
+      return get403(req, res);
     }
 
     next();
