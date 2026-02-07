@@ -1,9 +1,6 @@
 import { Router } from "express";
+
 const router = Router();
-const routes = {
-  signupRoute: "/v1/auth/signup",
-  loginRoute: "/v1/auth/login",
-};
 
 const projects = [
   {
@@ -108,12 +105,12 @@ const projects = [
 ];
 
 router.get("/", (req, res) => {
-  res.render("projects/projects", { routes, projects });
+  res.render("projects/projects", { projects });
 });
 
-router.get("/new" , (req ,res) => {
-  res.render("projects/add-project" , {routes});
-})
+router.get("/new", (req, res) => {
+  res.render("projects/add-project");
+});
 
 router.get("/:id", (req, res) => {
   const projectId = parseInt(req.params.id);
@@ -121,12 +118,11 @@ router.get("/:id", (req, res) => {
 
   if (!project) {
     return res.status(404).render("error/error", {
-      routes,
       error: { message: "Project not found", status: 404 },
     });
   }
 
-  res.render("projects/project-detail", { routes, project });
+  res.render("projects/project-detail", { project });
 });
 
 export default router;
