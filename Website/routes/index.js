@@ -1,12 +1,10 @@
 import { Router } from "express";
-import {AuthRouter} from "./auth/auth.js";
-import workshopRoutes from "./workshop/workshop.js";
-import projectRouter from "./projects/project.js";
+import { AuthRouter } from "./auth/auth.js";
+import { PagesRouter } from "./pages/pages.js";
 
 const router = Router();
 
-router.use("/auth" , AuthRouter);
-router.use('/workshops', workshopRoutes);
-router.use("/projects", projectRouter);
+router.use("/auth", AuthRouter);
+router.use("/", PagesRouter);
 
-export {router as GlobalRouter};
+export { router as GlobalRouter };
