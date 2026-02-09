@@ -14,7 +14,8 @@
   "extraResources": ["src/assets/**"],
   "icon": "./icon.jpg",
   "mac": {
-    "target": "dir"
+    "target": ["dir" , "dmg"],
+    "category": "public.app-category.utilities"
   },
   "linux": {
     "target": "AppImage",
