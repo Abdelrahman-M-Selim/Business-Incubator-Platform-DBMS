@@ -14,8 +14,7 @@ import {
     ChevronDown
 } from 'lucide-react';
 
-const Sidebar = () => {
-    const [activeItem, setActiveItem] = useState('Dashboard');
+const Sidebar = ({ activeTab = 'Dashboard', setActiveTab = () => {} }) => {
     const [isElementsOpen, setIsElementsOpen] = useState(false);
 
     const navItems = [
@@ -25,12 +24,12 @@ const Sidebar = () => {
         { id: 4, icon: Package, label: 'Workshops', badge: null },
         { id: 5, icon: ShoppingCart, label: 'Resources', badge: null },
         { id: 6, icon: FileText, label: 'Funding', badge: 'New' },
-        { id: 6, icon: FileText, label: 'Notifications', badge: 'New' },
-        // { id: 7, icon: Layers, label: 'Notifications', badge: 'New', hasDropdown: true }
+        { id: 7, icon: FileText, label: 'Notifications', badge: 'New' },
+        // { id: 8, icon: Layers, label: 'Notifications', badge: 'New', hasDropdown: true }
     ];
 
     const handleItemClick = (label) => {
-        setActiveItem(label);
+        setActiveTab(label);
         if (label === 'Elements') {
             setIsElementsOpen(!isElementsOpen);
         }
@@ -52,7 +51,7 @@ const Sidebar = () => {
             <nav className="flex-1 p-3 overflow-y-auto">
                 {navItems.map((item) => {
                     const Icon = item.icon;
-                    const isActive = activeItem === item.label;
+                    const isActive = activeTab === item.label;
 
                     return (
                         <div key={item.id}>
