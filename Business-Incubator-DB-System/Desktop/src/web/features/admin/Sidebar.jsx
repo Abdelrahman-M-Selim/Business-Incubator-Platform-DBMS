@@ -36,7 +36,7 @@ const Sidebar = ({ activeTab = 'Dashboard', setActiveTab = () => {} }) => {
     };
 
     return (
-        <div className="w-64 h-screen bg-white border-r border-gray-200 flex flex-col">
+        <div className="w-64 h-screen bg-white border-r border-gray-200 flex flex-col shrink-0">
             {/* Logo */}
             <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center gap-2">
