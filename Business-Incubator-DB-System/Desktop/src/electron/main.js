@@ -16,6 +16,13 @@ import {
   exportAttendanceReportPDF,
   exportFeedbackReportPDF,
 } from './backend/workshop/workshops.js';
+import {
+  getAllResources,
+  addResource,
+  getPendingBookings,
+  updateBookingStatus,
+  getResourceStats
+} from './backend/resources/resources.js';
 
 app.on('ready', () => {
   const mainWindow = new BrowserWindow({
@@ -83,6 +90,27 @@ app.on('ready', () => {
   ipcMain.handle('export-feedback-report', async () => {
     return await exportFeedbackReportPDF();
   });
+
+  ipcMain.handle('resources:get-all', async () => {
+    return await getAllResources();
+  });
+
+  ipcMain.handle('resources:add', async (_event, data) => {
+    return await addResource(data);
+  });
+
+  ipcMain.handle('bookings:get-pending', async () => {
+    return await getPendingBookings();
+  });
+
+  ipcMain.handle('bookings:update-status', async (_event, data) => {
+    return await updateBookingStatus(data);
+  });
+
+  ipcMain.handle('resources:get-stats', async () => {
+    return await getResourceStats();
+  });
+  
   handleCloseEvents(mainWindow);
 });
 
