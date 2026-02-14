@@ -1,4 +1,4 @@
-import pool from '../../config/database.js';
+import pool from "../config/database.js";
 
 export const getAllResources = async () => {
   const res = await pool.query('SELECT * FROM resources ORDER BY created_at DESC');

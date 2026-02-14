@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  UserTie,
   Plus,
-  ChalkboardTeacher,
   Briefcase,
   UserCheck,
   Search,
@@ -58,7 +56,7 @@ const Mentors = () => {
           <div>
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 flex items-center gap-4">
               <div className="p-3 md:p-4 bg-purple-100 rounded-2xl text-purple-600 shadow-sm">
-                <UserTie size={24} />
+                <Plus size={24} />
               </div>
               Mentors
             </h1>
@@ -80,7 +78,7 @@ const Mentors = () => {
           <StatCard
             title="Total Mentors"
             value={mentors.length}
-            icon={UserTie}
+            icon={Briefcase}
             colorClass="bg-blue-50 text-blue-600"
           />
           <StatCard
@@ -104,7 +102,7 @@ const Mentors = () => {
               (acc, m) => acc + parseInt(m.workshops_count || 0),
               0,
             )}
-            icon={ChalkboardTeacher}
+            icon={Briefcase}
             colorClass="bg-purple-50 text-purple-600"
           />
         </div>

@@ -1,4 +1,4 @@
-import pool from '../../config/database.js';
+import pool from "../config/database.js";
 
 // Get All Mentors with Counts 
 export const getAllMentors = async () => {

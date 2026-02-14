@@ -3,7 +3,6 @@ import {
   Box,
   Plus,
   Building,
-  ChalkboardTeacher,
   Laptop,
   Layers,
   Search,
@@ -90,7 +89,7 @@ const Resources = () => {
           <StatCard
             title="Meeting Rooms"
             value={resources.filter((r) => r.type === "meeting_room").length}
-            icon={ChalkboardTeacher}
+            icon={Laptop}
             colorClass="bg-orange-50 text-orange-600"
           />
           <StatCard
