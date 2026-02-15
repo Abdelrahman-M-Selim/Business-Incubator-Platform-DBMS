@@ -3,9 +3,27 @@ import pool from "../../config/db.js";
 // 1. Get All Workshops
 export const getAllWorkshopsQuery = async () => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM workshops ORDER BY date DESC",
-    );
+    const result = await pool.query(`
+      SELECT 
+        w.id,
+        w.title,
+        w.description,
+        w.trainer_id,
+        w.mentor_name,
+        w.location,
+        w.start_date,
+        w.end_date,
+        w.start_time,
+        w.end_time,
+        w.capacity,
+        COUNT(we.id)::integer as enrolled_count,
+        w.status,
+        w.schedule
+      FROM workshops w
+      LEFT JOIN workshop_enrollments we ON w.id = we.workshop_id
+      GROUP BY w.id, w.title, w.description, w.trainer_id, w.mentor_name, w.location, w.start_date, w.end_date, w.start_time, w.end_time, w.capacity, w.status, w.schedule
+      ORDER BY w.start_date DESC
+    `);
     return result.rows;
   } catch (err) {
     throw err;
@@ -17,18 +35,38 @@ export const getWorkshopByIdQuery = async (id) => {
   try {
     const query = `
       SELECT 
-        w.*, 
+        w.id,
+        w.title,
+        w.description,
+        w.trainer_id,
+        w.mentor_name,
+        w.location,
+        w.start_date,
+        w.end_date,
+        w.start_time,
+        w.end_time,
+        w.capacity,
+        COUNT(we.id)::integer as enrolled_count,
+        w.status,
+        w.schedule,
         COALESCE(
           json_agg(
-            json_build_object('id', u.id, 'name', u.name, 'email', u.email)
-          ) FILTER (WHERE u.id IS NOT NULL), 
-          '[]'
+            json_build_object(
+              'id', we.id,
+              'name', we.entrepreneur_name, 
+              'email', we.entrepreneur_email,
+              'attended', we.attended,
+              'feedback_rating', we.feedback_rating,
+              'feedback_comment', we.feedback_comment,
+              'enrollment_date', we.enrollment_date
+            ) ORDER BY we.id
+          ) FILTER (WHERE we.id IS NOT NULL), 
+          '[]'::json
         ) as attendees
       FROM workshops w
-      LEFT JOIN workshop_attendees wa ON w.id = wa.workshop_id
-      LEFT JOIN users u ON wa.user_id = u.id
+      LEFT JOIN workshop_enrollments we ON w.id = we.workshop_id
       WHERE w.id = $1
-      GROUP BY w.id
+      GROUP BY w.id, w.title, w.description, w.trainer_id, w.mentor_name, w.location, w.start_date, w.end_date, w.start_time, w.end_time, w.capacity, w.status, w.schedule
     `;
     const result = await pool.query(query, [id]);
 
@@ -41,32 +79,87 @@ export const getWorkshopByIdQuery = async (id) => {
   }
 };
 
-// 3. Attend Workshop (Insert into Junction Table)
-export const joinWorkshopQuery = async (workshopId, userId) => {
+// 3. Attend Workshop (Insert into workshop_enrollments)
+export const joinWorkshopQuery = async (
+  workshopId,
+  userId,
+  entrepreneurName,
+  entrepreneurEmail,
+) => {
   try {
+    console.log(
+      "Inserting enrollment - workshopId:",
+      workshopId,
+      "userId:",
+      userId,
+      "name:",
+      entrepreneurName,
+      "email:",
+      entrepreneurEmail,
+    );
+
     const query = `
-      INSERT INTO workshop_attendees (workshop_id, user_id)
-      VALUES ($1, $2)
-      ON CONFLICT (workshop_id, user_id) DO NOTHING
+      INSERT INTO workshop_enrollments (workshop_id, entrepreneur_id, entrepreneur_name, entrepreneur_email, enrollment_date)
+      VALUES ($1, $2, $3, $4, NOW())
       RETURNING *
     `;
-    const result = await pool.query(query, [workshopId, userId]);
+    const result = await pool.query(query, [
+      workshopId,
+      userId,
+      entrepreneurName,
+      entrepreneurEmail,
+    ]);
+
+    console.log("Inserted enrollment result:", result.rows[0]);
+
+    // Update enrolled_count in workshops table
+    if (result.rows[0]) {
+      await pool.query(
+        "UPDATE workshops SET enrolled_count = enrolled_count + 1 WHERE id = $1",
+        [workshopId],
+      );
+    }
+
     return result.rows[0];
   } catch (err) {
     throw err;
   }
 };
 
-// 4. Cancel Attendance (Delete from Junction Table)
+// 4. Cancel Attendance (Delete from workshop_enrollments)
 export const leaveWorkshopQuery = async (workshopId, userId) => {
   try {
     const query = `
-      DELETE FROM workshop_attendees 
-      WHERE workshop_id = $1 AND user_id = $2
+      DELETE FROM workshop_enrollments 
+      WHERE workshop_id = $1 AND entrepreneur_id = $2
       RETURNING *
     `;
     const result = await pool.query(query, [workshopId, userId]);
+
+    // Decrease enrolled_count in workshops table
+    if (result.rows[0]) {
+      await pool.query(
+        "UPDATE workshops SET enrolled_count = GREATEST(enrolled_count - 1, 0) WHERE id = $1",
+        [workshopId],
+      );
+    }
+
     return result.rows[0];
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 5. Check if user is already enrolled
+export const checkEnrollmentQuery = async (workshopId, userId) => {
+  try {
+    const query = `
+      SELECT * FROM workshop_enrollments
+      WHERE workshop_id = $1 AND entrepreneur_id = $2
+      LIMIT 1
+    `;
+    const result = await pool.query(query, [workshopId, userId]);
+    return result.rows[0] || null;
   } catch (err) {
     throw err;
   }

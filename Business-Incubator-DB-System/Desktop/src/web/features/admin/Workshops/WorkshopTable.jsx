@@ -12,9 +12,11 @@ import {
   Clock,
   AlertCircle,
 } from "lucide-react";
+import { workshopService } from "../../../services/workshopService";
 
 const WorkshopTable = ({ workshops, onView, onDelete }) => {
   const [expandedId, setExpandedId] = useState(null);
+  const [workshopDetails, setWorkshopDetails] = useState({});
 
   const getStatusBadge = (status) => {
     const styles = {
@@ -96,11 +98,28 @@ const WorkshopTable = ({ workshops, onView, onDelete }) => {
                   {/* Expand Button */}
                   <td className="p-5 pr-0">
                     <button
-                      onClick={() =>
-                        setExpandedId(
-                          expandedId === workshop.id ? null : workshop.id,
-                        )
-                      }
+                      onClick={async () => {
+                        if (expandedId === workshop.id) {
+                          setExpandedId(null);
+                        } else {
+                          // Fetch full workshop details with enrollments
+                          try {
+                            const fullWorkshop =
+                              await workshopService.getWorkshop(workshop.id);
+                            setWorkshopDetails({
+                              ...workshopDetails,
+                              [workshop.id]: fullWorkshop,
+                            });
+                            setExpandedId(workshop.id);
+                          } catch (error) {
+                            console.error(
+                              "Error fetching workshop details:",
+                              error,
+                            );
+                            setExpandedId(workshop.id);
+                          }
+                        }
+                      }}
                       className={`p-1 rounded-md transition-all ${expandedId === workshop.id ? "bg-indigo-100 text-indigo-600" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"}`}
                     >
                       {expandedId === workshop.id ? (
@@ -224,49 +243,82 @@ const WorkshopTable = ({ workshops, onView, onDelete }) => {
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                              {workshop.enrollments &&
-                              workshop.enrollments.length > 0 ? (
-                                workshop.enrollments.map((enrollment, idx) => (
-                                  <tr
-                                    key={idx}
-                                    className="hover:bg-gray-50 transition-colors"
-                                  >
-                                    <td className="px-5 py-3 font-medium text-gray-900">
-                                      {enrollment.entrepreneurName}
-                                    </td>
-                                    <td className="px-5 py-3 text-gray-600">
-                                      {enrollment.entrepreneurEmail}
-                                    </td>
-                                    <td className="px-5 py-3 text-gray-500">
-                                      {formatDate(enrollment.enrollmentDate)}
-                                    </td>
-                                    <td className="px-5 py-3">
-                                      <span
-                                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold ${enrollment.attended ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}
-                                      >
-                                        {enrollment.attended ? (
-                                          <CheckCircle size={10} />
+                              {(workshopDetails[workshop.id]?.enrollments ||
+                                workshop.enrollments) &&
+                              (
+                                workshopDetails[workshop.id]?.enrollments ||
+                                workshop.enrollments
+                              ).length > 0 ? (
+                                (
+                                  workshopDetails[workshop.id]?.enrollments ||
+                                  workshop.enrollments
+                                ).map((enrollment, idx) => {
+                                  const name =
+                                    enrollment.entrepreneurName ||
+                                    enrollment.entrepreneur_name ||
+                                    enrollment.name ||
+                                    "-";
+                                  const email =
+                                    enrollment.entrepreneurEmail ||
+                                    enrollment.entrepreneur_email ||
+                                    enrollment.email ||
+                                    "-";
+                                  const enrollmentDate =
+                                    enrollment.enrollmentDate ||
+                                    enrollment.enrollment_date;
+                                  const attended = enrollment.attended;
+                                  const feedbackRating =
+                                    enrollment.feedbackRating ||
+                                    enrollment.feedback_rating;
+
+                                  return (
+                                    <tr
+                                      key={idx}
+                                      className="hover:bg-gray-50 transition-colors"
+                                    >
+                                      <td className="px-5 py-3 font-medium text-gray-900">
+                                        {name}
+                                      </td>
+                                      <td className="px-5 py-3 text-gray-600">
+                                        {email}
+                                      </td>
+                                      <td className="px-5 py-3 text-gray-500">
+                                        {enrollmentDate
+                                          ? new Date(
+                                              enrollmentDate,
+                                            ).toLocaleDateString("en-US", {
+                                              month: "short",
+                                              day: "numeric",
+                                              year: "numeric",
+                                            })
+                                          : "-"}
+                                      </td>
+                                      <td className="px-5 py-3">
+                                        <span
+                                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold ${attended ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}
+                                        >
+                                          {attended ? (
+                                            <CheckCircle size={10} />
+                                          ) : (
+                                            <AlertCircle size={10} />
+                                          )}
+                                          {attended ? "Present" : "Absent"}
+                                        </span>
+                                      </td>
+                                      <td className="px-5 py-3">
+                                        {feedbackRating ? (
+                                          <span className="flex items-center gap-1 text-orange-500 font-bold">
+                                            ★ {feedbackRating}
+                                          </span>
                                         ) : (
-                                          <AlertCircle size={10} />
+                                          <span className="text-gray-400 italic text-xs">
+                                            Pending
+                                          </span>
                                         )}
-                                        {enrollment.attended
-                                          ? "Present"
-                                          : "Absent"}
-                                      </span>
-                                    </td>
-                                    <td className="px-5 py-3">
-                                      {enrollment.feedbackRating ? (
-                                        <span className="flex items-center gap-1 text-orange-500 font-bold">
-                                          ★ {enrollment.feedbackRating}
-                                        </span>
-                                      ) : (
-                                        <span className="text-gray-400 italic text-xs">
-                                          Pending
-                                        </span>
-                                      )}
-                                    </td>
-                                  </tr>
-                                ))
+                                      </td>
+                                    </tr>
+                                  );
+                                })
                               ) : (
                                 <tr>
                                   <td
