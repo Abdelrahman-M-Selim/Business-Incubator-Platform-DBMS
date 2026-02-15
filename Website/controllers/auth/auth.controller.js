@@ -118,6 +118,8 @@ export const login = async (req, res, next) => {
 
     req.session.userId = user.id;
     req.session.userRole = user.role;
+    req.session.userName = user.name;
+    req.session.userEmail = user.email;
 
     res.send(`
       <script>
