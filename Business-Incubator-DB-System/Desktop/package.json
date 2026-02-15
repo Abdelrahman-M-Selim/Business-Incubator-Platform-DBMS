@@ -12,7 +12,7 @@
     "dist:mac": "npm run build && electron-builder --mac --x64",
     "dist:win": "npm run build && electron-builder --win --x64",
     "dist:linux": "npm run build && electron-builder --linux --x64",
-    "migrate": "node src/scripts/runMigration.js",
+    "migrate": "node src/scripts/runMigration.cjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
