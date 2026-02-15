@@ -1,4 +1,4 @@
-import pool from "../config/database.js";
+import pool from "../config/database.cjs";
 
 // Get all funding requests
 export const getAllFundingRequests = async (query = "") => {
