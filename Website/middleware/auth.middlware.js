@@ -8,6 +8,8 @@ export const isAuth = (req, res, next) => {
   req.user = {
     id: req.session.userId,
     role: req.session.userRole,
+    name: req.session.userName,
+    email: req.session.userEmail,
   };
 
   next();
