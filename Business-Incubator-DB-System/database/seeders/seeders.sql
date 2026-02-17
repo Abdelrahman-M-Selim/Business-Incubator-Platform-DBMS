@@ -1067,6 +1067,15 @@ SELECT 'MENTORS SAMPLE:' as info;
 SELECT id, expertise, years_of_experience, availability, status FROM mentors LIMIT 5;
 
 -- ============================================
+-- ============================================
+-- UPDATE USERS TABLE WITH MENTOR EXPERTISE, COMPANY, BIO & STATUS
+-- ============================================
+UPDATE "users" SET "expertise" = 'Technology', "company" = 'Tech Innovations', "bio" = 'Full-stack developer with 15+ years experience in building scalable web applications. Specialized in React, Node.js, and cloud architecture.', "status" = 'active' WHERE "id" = 11;
+UPDATE "users" SET "expertise" = 'Business Strategy', "company" = 'Business Ventures', "bio" = 'Serial entrepreneur and business strategist. Founded 3 successful startups. Expert in business model validation and go-to-market strategies.', "status" = 'active' WHERE "id" = 12;
+UPDATE "users" SET "expertise" = 'Digital Marketing', "company" = 'Marketing Experts', "bio" = 'Digital marketing expert with proven track record in growth hacking. Helped 50+ startups scale from 0 to 10K users.', "status" = 'active' WHERE "id" = 13;
+UPDATE "users" SET "expertise" = 'Finance & Investments', "company" = 'Sherif Ventures', "bio" = 'Investment banker turned startup advisor. Specialized in fundraising strategy, financial modeling, and investor relations.', "status" = 'active' WHERE "id" = 14;
+UPDATE "users" SET "expertise" = 'Venture Capital', "company" = 'Cairo Angels Fund', "bio" = 'Venture capital analyst with 8 years experience evaluating early-stage startups. Focus on FinTech and HealthTech sectors.', "status" = 'active' WHERE "id" = 15;
+
 -- SUCCESS MESSAGE
 -- ============================================
 SELECT '
