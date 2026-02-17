@@ -23,15 +23,23 @@ export const getAllWorkshops = async () => {
              COUNT(we.id)::integer as "enrolledCount"
       FROM workshops w
       LEFT JOIN workshop_enrollments we ON w.id = we.workshop_id
-      GROUP BY w.id
+      GROUP BY w.id, w.title, w.description, w.mentor_name, w.location, w.start_date, w.end_date, w.start_time, w.end_time, w.capacity, w.status, w.created_at
       ORDER BY w.created_at DESC
     `;
 
+    console.log("Executing getAllWorkshops query...");
     const result = await db.query(query);
     console.log("Database returned workshops:", result.rows);
+    console.log(`Total workshops found: ${result.rows.length}`);
+
+    if (result.rows.length === 0) {
+      console.warn("⚠️ No workshops found in database");
+    }
+
     return result.rows;
   } catch (error) {
-    console.error("Error fetching workshops:", error);
+    console.error("❌ Error fetching workshops:", error.message);
+    console.error("Full error:", error);
     throw error;
   }
 };
