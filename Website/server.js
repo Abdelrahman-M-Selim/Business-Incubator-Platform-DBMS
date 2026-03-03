@@ -1,8 +1,6 @@
-import { config } from "dotenv";
+import "dotenv/config";
 import app from "./app.js";
 import pool from "./config/db.js";
-
-config({ debug: false });
 
 const port = process.env.PORT || 3000;
 
@@ -18,7 +16,9 @@ async function testConnection() {
 
 testConnection()
   .then(() => {
-    app.listen(port, () => console.log(`Server is running on http://localhost:${port}`));
+    app.listen(port, () =>
+      console.log(`Server is running on http://localhost:${port}`),
+    );
   })
   .catch((err) => {
     console.error("Failed to connect DB or start server:", err.message);

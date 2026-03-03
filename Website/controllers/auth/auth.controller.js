@@ -56,10 +56,20 @@ export const profilePage = async (req, res, next) => {
 
 export const register = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, confirmPassword, terms } = req.body;
 
     if (!name || !email || !password) {
       req.flash("error", "All fields are required");
+      return res.redirect("/v1/auth/signup");
+    }
+
+    if (password !== confirmPassword) {
+      req.flash("error", "Passwords do not match");
+      return res.redirect("/v1/auth/signup");
+    }
+
+    if (!terms) {
+      req.flash("error", "You must agree to the terms");
       return res.redirect("/v1/auth/signup");
     }
 
@@ -121,12 +131,7 @@ export const login = async (req, res, next) => {
     req.session.userName = user.name;
     req.session.userEmail = user.email;
 
-    res.send(`
-      <script>
-        localStorage.setItem('isLoggedIn', 'true');
-        window.location.href = '/v1/auth/profile';
-      </script>
-    `);
+    res.redirect("/v1/auth/profile");
   } catch (err) {
     req.flash("error", "An error occurred during login. Please try again.");
     res.redirect("/v1/auth/login");
@@ -136,17 +141,9 @@ export const login = async (req, res, next) => {
 export const logout = (req, res, next) => {
   try {
     req.session.destroy((err) => {
-      if (err) {
-        return next(err);
-      }
+      if (err) return next(err);
       res.clearCookie("repodoctor.sid");
-
-      res.send(`
-        <script>
-          localStorage.setItem('isLoggedIn', 'false');
-          window.location.href = '/v1/auth/login';
-        </script>
-      `);
+      res.redirect("/v1/auth/login");
     });
   } catch (err) {
     next(err);

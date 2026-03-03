@@ -36,6 +36,14 @@
                     </div>
                 <% } %>
 
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="bg-red-100 border-4 border-red-600 p-4 mb-6 flex items-start gap-3">
+                        <div class="flex-1 text-red-800 font-bold text-sm uppercase font-display">
+                            Error: <span class="font-sans italic"><%= error %></span>
+                        </div>
+                    </div>
+                <% } %>
+
                 <form id="signupForm" action="/v1/auth/register" method="POST" class="space-y-6">
                     <div>
                         <label class="block text-xs font-black uppercase mb-2 font-display tracking-widest text-slate-500" for="name">Full name</label>
@@ -63,7 +71,7 @@
                     </div>
 
                     <label class="flex items-start gap-3 text-sm font-bold cursor-pointer group">
-                        <input id="terms" type="checkbox" required class="mt-1 w-5 h-5 border-4 border-black accent-brand-indigo cursor-pointer" />
+                        <input id="terms" type="checkbox" name="terms" required class="mt-1 w-5 h-5 border-4 border-black accent-brand-indigo cursor-pointer" />
                         <span class="text-slate-600 group-hover:text-black transition-colors">I agree to the Terms of Service and Privacy Policy.</span>
                     </label>
 

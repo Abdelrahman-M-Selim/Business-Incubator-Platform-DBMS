@@ -2,9 +2,11 @@ import { get401 } from "../controllers/error/error.controller.js";
 
 export const isAuth = (req, res, next) => {
   if (!req.session || !req.session.userId) {
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      return res.status(401).json({ success: false, message: "Unauthorized. Please login." });
+    }
     return get401(req, res);
   }
-
   req.user = {
     id: req.session.userId,
     role: req.session.userRole,

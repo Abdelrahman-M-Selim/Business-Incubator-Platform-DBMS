@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { corsOptions } from "./config/corsOptions.js";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import session from "express-session";
@@ -27,8 +28,7 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors({ origin: true, credentials: true }));
-
+app.use(cors(corsOptions));
 app.use(express.static("public"));
 
 const limiter = rateLimit({
@@ -43,6 +43,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+app.set("trust proxy", 1);
 app.use(
   session({
     store: new pgSession({
